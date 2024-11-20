@@ -1,6 +1,7 @@
 package com.github.first_project.config;
 
 import com.github.first_project.dto.AuthInfo;
+import com.github.first_project.exception.UnauthorizedException;
 import com.github.first_project.service.JwtService;
 import org.springframework.core.MethodParameter;
 import org.springframework.web.bind.support.WebDataBinderFactory;
@@ -30,14 +31,15 @@ public class MemberAuthArgumentResolver implements HandlerMethodArgumentResolver
                                   WebDataBinderFactory binderFactory) {
         String authorization = webRequest.getHeader("Authorization");
         if (authorization == null || !authorization.startsWith("Bearer ")) {
-            throw new RuntimeException("UnauthorizedException");
+            throw new UnauthorizedException("Unauthorized access");
         }
         String token = authorization.substring(7);
         Map<String, Long> decodedToken = jwtService.decode(token);
         Long memberId = decodedToken.get(JwtService.CLAIM_NAME_MEMBER_ID);
         if (memberId == null) {
-            throw new RuntimeException("UnauthorizedException");
+            throw new UnauthorizedException("Unauthorized access");
         }
         return AuthInfo.of(memberId);
     }
+
 }

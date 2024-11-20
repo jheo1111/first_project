@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -21,10 +22,12 @@ public class Comment {
 
     private LocalDateTime createdAt;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
+    @Setter
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "writer_id")
     private Member writer;
@@ -37,11 +40,4 @@ public class Comment {
         this.writer = writer;
     }
 
-    public void setPost(Post post) {
-        this.post = post;
-    }
-
-    public void setWriter(Member writer) {
-        this.writer = writer;
-    }
 }
