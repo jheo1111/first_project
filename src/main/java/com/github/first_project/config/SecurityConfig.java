@@ -1,5 +1,6 @@
 package com.github.first_project.config;
 
+import com.github.first_project.service.CustomUserDetailsService;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -10,23 +11,25 @@ import org.springframework.security.config.annotation.SecurityConfigurerAdapter;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultSecurityFilterChain;
-import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRepository;
 
+@Getter
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFilterChain, HttpSecurity> {
     private final JwtAuthenticationSuccessHandler successHandler;
-    @Getter
-    private PasswordEncoder passwordEncoder;
+    private final CustomUserDetailsService customUserDetailsService;
+
+    private final PasswordEncoder passwordEncoder;
 
     // @Lazy 어노테이션을 사용하여 순환 의존성 해결
-    public SecurityConfig(JwtAuthenticationSuccessHandler successHandler, @Lazy PasswordEncoder passwordEncoder) {
+    public SecurityConfig(JwtAuthenticationSuccessHandler successHandler, CustomUserDetailsService customUserDetailsService, @Lazy PasswordEncoder passwordEncoder) {
         this.successHandler = successHandler;
+        this.customUserDetailsService = customUserDetailsService;
         this.passwordEncoder = passwordEncoder;
     }
     @Bean
@@ -41,12 +44,9 @@ public class SecurityConfig extends SecurityConfigurerAdapter<DefaultSecurityFil
 
     @Override
     public void configure(HttpSecurity http) throws Exception {
-        http
-                .csrf()
-                .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())  // Ensure CSRF token is set in the cookie
-                .and()
+        http.csrf().disable()
                 .authorizeRequests()
-                .requestMatchers("/login").permitAll()  // Allow login without CSRF token check
+                .requestMatchers("/login").permitAll()
                 .anyRequest().authenticated();
     }
 

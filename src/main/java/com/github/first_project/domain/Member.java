@@ -1,5 +1,6 @@
 package com.github.first_project.domain;
 
+import com.github.first_project.dto.MemberEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;
@@ -36,5 +37,9 @@ public class Member {
     public void addPost(Post post) {
         posts.add(post);
         post.setWriter(this);
+    }
+
+    public MemberEntity orElseThrow(Object o) {
+        return null;
     }
 }
