@@ -35,5 +35,4 @@ public class PostController {
                         .collect(Collectors.toList())
         );
     }
-
 }
