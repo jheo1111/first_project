@@ -11,7 +11,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/members")
+@RequestMapping("/api/v1/members")
 public class MemberController {
 
     @Autowired
@@ -20,7 +20,7 @@ public class MemberController {
     @Autowired
     private PasswordEncoder passwordEncoder;
 
-    @PostMapping("/login")
+    @PostMapping("/api/v1/login")
     public String login(@RequestBody LoginRequest loginRequest) {
         // 사용자 인증
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
@@ -33,7 +33,7 @@ public class MemberController {
         return "Login successful!";
     }
 
-    @PostMapping("/register")
+    @PostMapping("api/v1/register")
     public String register(@RequestBody Member member) {
         // 비밀번호 암호화
         String encodedPassword = passwordEncoder.encode(member.getPassword());

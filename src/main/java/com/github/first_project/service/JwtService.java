@@ -21,7 +21,7 @@ import java.util.Map;
 @Service
 public class JwtService {
     @Getter
-    @Value("${jwt.secret}")
+    @Value("project1")
     private String secretKey;
 
     public static final String CLAIM_NAME_MEMBER_ID = "Member_id";

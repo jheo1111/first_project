@@ -1,6 +1,5 @@
 package com.github.first_project.domain;
 
-import com.github.first_project.dto.MemberEntity;
 import jakarta.persistence.*;
 import lombok.Builder;
 import lombok.Getter;

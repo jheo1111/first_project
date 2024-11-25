@@ -33,6 +33,7 @@ public class PostService {
     }
 
     // 모든 게시물을 가져오는 메서드
+    @Transactional(readOnly = true)
     public List<Post> getAllPosts() {
         return postRepository.findAll();
     }

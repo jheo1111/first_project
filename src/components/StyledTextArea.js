@@ -3,7 +3,7 @@ import TextareaAutosize from '@mui/base/TextareaAutosize';
 import {blue, grey} from './CustomButton';
 
 export const StyledTextarea = styled(TextareaAutosize)(
-  ({ theme }) => `
+    ({ theme }) => `
     width: 320px;
     font-family: IBM Plex Sans, sans-serif;
     font-size: 0.875rem;
