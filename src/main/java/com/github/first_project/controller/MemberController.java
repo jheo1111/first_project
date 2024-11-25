@@ -1,46 +1,26 @@
 package com.github.first_project.controller;
-import com.github.first_project.domain.Member;
+
 import com.github.first_project.dto.LoginRequest;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.security.crypto.password.PasswordEncoder;
+import com.github.first_project.dto.SignUpRequest;
+import com.github.first_project.service.MemberService;
+import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/api/v1/members")
+@RequiredArgsConstructor
+@RequestMapping("/api")
 public class MemberController {
+    private final MemberService memberService;
 
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
-    private PasswordEncoder passwordEncoder;
-
-    @PostMapping("/api/v1/login")
-    public String login(@RequestBody LoginRequest loginRequest) {
-        // 사용자 인증
-        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
-                loginRequest.getUsername(), loginRequest.getPassword());
-
-        Authentication authentication = authenticationManager.authenticate(authenticationToken);
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
-        // 로그인 성공시 반환 (예: JWT, 인증된 사용자 정보 등)
-        return "Login successful!";
+    @PostMapping("/signup")
+    public String register(@RequestBody SignUpRequest signupRequest) {
+        memberService.register(signupRequest.getEmail(), signupRequest.getPassword());
+        return "회원가입이 완료되었습니다.";
     }
 
-    @PostMapping("api/v1/register")
-    public String register(@RequestBody Member member) {
-        // 비밀번호 암호화
-        String encodedPassword = passwordEncoder.encode(member.getPassword());
-
-        // 사용자 저장 로직 (예: DB에 저장)
-        // memberRepository.save(new Member(member.getUsername(), encodedPassword));
-
-        return "Registration successful!";
+    @PostMapping("/login")
+    public String login(@RequestBody LoginRequest loginRequest) {
+        memberService.authenticate(loginRequest.getEmail(), loginRequest.getPassword());
+        return "로그인이 성공적으로 완료되었습니다.";
     }
 }

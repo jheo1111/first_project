@@ -1,10 +1,8 @@
 package com.github.first_project.domain;
 
 import jakarta.persistence.*;
-import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.Setter;
 
 import java.time.LocalDateTime;
 
@@ -20,24 +18,17 @@ public class Comment {
     @Lob
     private String content;
 
-    private LocalDateTime createdAt;
+    private String author;
 
-    @Setter
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "post_id")
     private Post post;
 
-    @Setter
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "writer_id")
-    private Member writer;
-
-    @Builder
-    public Comment(String content, LocalDateTime createdAt, Post post, Member writer) {
+    public Comment(String content, String author, Post post) {
         this.content = content;
-        this.createdAt = createdAt;
+        this.author = author;
         this.post = post;
-        this.writer = writer;
     }
-
 }

@@ -5,6 +5,8 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -12,15 +14,24 @@ import java.time.LocalDateTime;
 public class Post {
 
     @Id
-    @GeneratedValue
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
 
-    private String body;
-    private LocalDateTime createdAt;
+    @Lob
+    private String content;
 
-    @ManyToOne
-    @JoinColumn(name = "writer_id")
-    private Member writer;
+    private String author;
+
+    private LocalDateTime createdAt = LocalDateTime.now();
+
+    @OneToMany(mappedBy = "post", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Comment> comments = new ArrayList<>();
+
+    public Post(String title, String content, String author) {
+        this.title = title;
+        this.content = content;
+        this.author = author;
+    }
 }

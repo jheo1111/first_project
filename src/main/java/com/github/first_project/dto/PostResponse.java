@@ -1,29 +1,25 @@
 package com.github.first_project.dto;
 
 import com.github.first_project.domain.Post;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
 import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Builder
-@AllArgsConstructor
 @Getter
 public class PostResponse {
-    private Long postId;
-    private Long writerMemberId;
+    private Long id;
     private String title;
-    private String body;
+    private String content;
+    private String author;
     private LocalDateTime createdAt;
 
     public static PostResponse from(Post post) {
-        return PostResponse.builder()
-                .postId(post.getId())
-                .writerMemberId(post.getWriter().getId())
-                .title(post.getTitle())
-                .body(post.getBody())
-                .createdAt(post.getCreatedAt())
-                .build();
+        PostResponse response = new PostResponse();
+        response.id = post.getId();
+        response.title = post.getTitle();
+        response.content = post.getContent();
+        response.author = post.getAuthor();
+        response.createdAt = post.getCreatedAt();
+        return response;
     }
 }
