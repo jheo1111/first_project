@@ -1,56 +1,71 @@
 package com.github.first_project.service;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
-import com.auth0.jwt.algorithms.Algorithm;
-import com.auth0.jwt.exceptions.JWTVerificationException;
-import com.auth0.jwt.interfaces.DecodedJWT;
-import jakarta.annotation.PostConstruct;
-import lombok.Getter;
-import lombok.extern.slf4j.Slf4j;
+import io.jsonwebtoken.*;
+import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
-import java.sql.Timestamp;
-import java.time.LocalDateTime;
+import javax.crypto.SecretKey;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 
-@Slf4j
-@Getter
 @Service
 public class JwtService {
-    @Getter
-    @Value("project1")
+
+    @Value("${jwt.secret}")
     private String secretKey;
 
-    public static final String CLAIM_NAME_MEMBER_ID = "Member_id";
-    private Algorithm algorithm;
-    private JWTVerifier jwtVerifier;
+    @Value("${jwt.expiration}")
+    private long expirationTime;
 
-    @PostConstruct
-    private void init() {
-        algorithm = Algorithm.HMAC256(secretKey);
-        jwtVerifier = JWT.require(algorithm).build();
+    public static final String CLAIM_NAME_MEMBER_ID = "memberId";
+
+    // SecretKey 생성 메서드
+    public SecretKey getSecretKey() {
+        return Keys.secretKeyFor(SignatureAlgorithm.HS256); // or HS512, depending on your algorithm
     }
 
-    public String encode(Long memberId) {
-        LocalDateTime expiredAt = LocalDateTime.now().plusWeeks(4L);
-        Date date = Timestamp.valueOf(expiredAt);
+    public String generateToken(Long memberId) {
+        Map<String, Object> claims = new HashMap<>();
+        claims.put(CLAIM_NAME_MEMBER_ID, memberId);
 
-        return JWT.create()
-                .withClaim(CLAIM_NAME_MEMBER_ID, memberId)
-                .withExpiresAt(date)
-                .sign(algorithm);
+        SecretKey secretKey = getSecretKey(); // Get the secure key
+        return Jwts.builder()
+                .setSubject(String.valueOf(memberId))
+                .signWith(secretKey)
+                .compact();
     }
 
     public Map<String, Long> decode(String token) {
         try {
-            DecodedJWT jwt = jwtVerifier.verify(token);
-            return Map.of(CLAIM_NAME_MEMBER_ID, jwt.getClaim(CLAIM_NAME_MEMBER_ID).asLong());
-        } catch (JWTVerificationException e) {
-            log.warn("Failed to decode jwt. token: {}", token, e);
-            return null;
+            Claims claims = Jwts.parserBuilder()
+                    .setSigningKey(getSecretKey())  // 안전한 키 사용
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+
+            Long memberId = claims.get(CLAIM_NAME_MEMBER_ID, Long.class);
+            Map<String, Long> decodedToken = new HashMap<>();
+            decodedToken.put(CLAIM_NAME_MEMBER_ID, memberId);
+
+            return decodedToken;
+        } catch (ExpiredJwtException e) {
+            throw new RuntimeException("Token expired", e);
+        } catch (JwtException | IllegalArgumentException e) {
+            throw new RuntimeException("Invalid token", e);
+        }
+    }
+
+    public boolean validateToken(String token) {
+        try {
+            Jwts.parserBuilder()
+                    .setSigningKey(getSecretKey())  // 안전한 키 사용
+                    .build()
+                    .parseClaimsJws(token);
+            return true;
+        } catch (JwtException | IllegalArgumentException e) {
+            return false;
         }
     }
 }

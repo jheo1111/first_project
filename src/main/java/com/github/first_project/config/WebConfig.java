@@ -1,29 +1,42 @@
 package com.github.first_project.config;
 
+import com.github.first_project.service.JwtService;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.method.support.HandlerMethodArgumentResolver;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.List;
 
 @Configuration
-@EnableWebSecurity
-public class WebConfig {
+public class WebConfig implements WebMvcConfigurer {
+
+    private final JwtService jwtService;
+
+    public WebConfig(JwtService jwtService) {
+        this.jwtService = jwtService;
+    }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
+    @Override
+    public void addArgumentResolvers(List<HandlerMethodArgumentResolver> resolvers) {
+        resolvers.add(new MemberAuthArgumentResolver(jwtService));
+    }
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf().disable() // CSRF 비활성화 (개발 환경에서만)
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/api/signup", "/api/login", "/api/posts").permitAll() // 인증 없이 허용
-                        .anyRequest().authenticated() // 그 외 요청은 인증 필요
-                );
+        http.csrf().disable()
+                .authorizeRequests()
+                .requestMatchers("/api/auth/**", "/api/posts/**", "/api/comments/**", "/api/likes/**").permitAll()
+                .anyRequest().authenticated();
 
         return http.build();
     }
