@@ -34,9 +34,10 @@ public class WebConfig implements WebMvcConfigurer {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf().disable()
-                .authorizeRequests()
-                .requestMatchers("/api/auth/**", "/api/posts/**", "/api/comments/**", "/api/likes/**").permitAll()
-                .anyRequest().authenticated();
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/api/auth/**", "/api/posts/**", "/api/comments/**", "/api/likes/**").permitAll()
+                        .anyRequest().authenticated()
+                );
 
         return http.build();
     }

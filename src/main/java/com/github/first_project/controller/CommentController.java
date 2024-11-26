@@ -1,6 +1,7 @@
 package com.github.first_project.controller;
 
 import com.github.first_project.dto.CommentRequest;
+import com.github.first_project.dto.EditCommentDTO;
 import com.github.first_project.service.CommentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +26,7 @@ public class CommentController {
     }
 
     @PutMapping("/{commentId}")
-    public ResponseEntity<String> updateComment(@PathVariable Long commentId, @RequestBody CommentRequest request) {
+    public ResponseEntity<String> updateComment(@PathVariable Long commentId, @RequestBody EditCommentDTO request) {
         commentService.updateComment(commentId, request);
         return ResponseEntity.ok("댓글이 성공적으로 수정되었습니다.");
     }

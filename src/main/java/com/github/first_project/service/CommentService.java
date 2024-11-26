@@ -2,6 +2,7 @@ package com.github.first_project.service;
 
 import com.github.first_project.dto.CommentRequest;
 import com.github.first_project.domain.Comment;
+import com.github.first_project.dto.EditCommentDTO;
 import com.github.first_project.repository.CommentRepository;
 import com.github.first_project.repository.PostRepository;
 import com.github.first_project.repository.MemberRepository;
@@ -34,7 +35,7 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
-    public void updateComment(Long commentId, CommentRequest request) {
+    public void updateComment(Long commentId, EditCommentDTO request) {
         Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new RuntimeException("댓글을 찾을 수 없습니다."));
         comment.setContent(request.getContent());
         commentRepository.save(comment);
